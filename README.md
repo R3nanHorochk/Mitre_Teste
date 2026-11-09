@@ -115,13 +115,3 @@ Assim que o segundo cliente se conecta ao servidor:
   deactivate
   ```
 
----
-
-## 👥 Autores
-
-- **Renan Horochk de Andrade**
-- **Alef De Souza Lima**
-- **Ryan Vinicius Ledo Dos Santos**
-- **Orientador:** Prof. Dr. Antonio Luiz Basile
-
-*Faculdade de Computação e Informática (FCI) — Universidade Presbiteriana Mackenzie (2026)*
