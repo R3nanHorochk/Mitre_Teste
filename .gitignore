@@ -1,0 +1,7 @@
+@"
+venv/
+caldera/
+__pycache__/
+*.pyc
+.env
+"@ | Out-File -FilePath .gitignore -Encoding utf8
