@@ -98,7 +98,7 @@ Assim que o segundo cliente se conecta ao servidor:
 1. **Treinamento Federado:** O servidor executa 3 rodadas de agregação via `FedAvg`. Os clientes treinam seus classificadores locais (`SGDClassifier`), usando **CTGAN** caso as anomalias representem menos de 15% dos dados, e transmitem apenas os pesos (`coef_` e `intercept_`) via gRPC.
 2. **Convergência:** Na 3ª rodada, o modelo alcança 100% de acurácia sobre os dados de validação.
 3. **Auditoria com XAI:**
-   - **SHAP (`LinearExplainer`):** Exibe a importância global das variáveis, comprovando que o volume de conexões ativas (`conn_count`) tem o maior peso positivo (~43), caracterizando as varreduras do Caldera.
+   - **SHAP (`LinearExplainer`):** Exibe a importância global das variáveis, comprovando que o volume de conexões ativas (`conn_count`) tem o maior peso positivo, caracterizando as varreduras do Caldera.
    - **LIME (`LimeTabularExplainer`):** Audita localmente uma amostra individual de teste sob suspeita de invasão, expondo as regras exatas que acionaram o alerta.
 
 ---
