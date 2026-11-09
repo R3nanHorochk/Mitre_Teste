@@ -6,7 +6,7 @@ Sistema de Detecção de Intrusões (IDS) descentralizado e auditável para rede
 
 ## 🛠️ 1. Instalação e Preparação do Ambiente
 
-Abra o terminal na pasta do projeto e configure o ambiente virtual:
+Abra o terminal na pasta do projeto e configure o ambiente virtual inicial:
 
 ### No Windows (PowerShell):
 ```powershell
@@ -31,40 +31,71 @@ pip install flwr==1.7.0 scikit-learn pandas numpy psutil shap lime ctgan
 > **Nota:** Caso o arquivo `traffic_logs.csv` já exista na pasta do projeto, pule direto para o **Passo 3**.
 
 1. **Tráfego Normal (Baseline - 2 minutos):**
+   Com a `venv` ativada:
    ```bash
    python collector.py
    ```
 
 2. **Tráfego sob Ataque (MITRE Caldera - 2 minutos):**
-   - Inicie a operação no painel web do Caldera (`http://localhost:8888`) com o perfil *Discovery*.
-   - Altere no script o rótulo para `is_attack = 1` e execute:
+   Inicie a operação no painel web do Caldera (`http://localhost:8888`) com o perfil *Discovery*, altere no script o rótulo para `is_attack = 1` e execute com a `venv` ativada:
    ```bash
    python collector.py
    ```
 
 ---
 
-## 🚀 3. Como Rodar o Servidor e os Clientes Juntos (1 Única Linha)
+## 🚀 3. Como Rodar o Treinamento Federado (3 Terminais Separados)
 
-O servidor precisa escutar na porta 8080 antes de receber os clientes. Com o ambiente virtual ativado, rode a linha única do seu sistema operacional para subir o servidor e os 2 clientes simultaneamente sem travar o terminal:
+**Importante:** Todo terminal novo abre sem o ambiente virtual ativo por padrão. Portanto, **você precisa ativar a `venv` em cada um dos 3 terminais** antes de rodar os scripts.
 
-### No Windows (PowerShell):
-```powershell
-Start-Process python -ArgumentList "server.py"; Start-Sleep -Seconds 2; Start-Process python -ArgumentList "client.py"; Start-Process python -ArgumentList "client.py"
-```
+O servidor precisa estar em escuta na porta `8080` antes da conexão dos clientes. Abra **3 janelas de terminal** e execute exatamente os passos abaixo:
 
-### No Linux / WSL / macOS:
-```bash
-python server.py & sleep 2 && python client.py & python client.py & wait
-```
+---
+
+### Terminal 1: Servidor Central (Flower)
+
+1. Ative a `venv`:
+   * **Windows (PowerShell):** `.\venv\Scripts\Activate.ps1`
+   * **Linux / WSL / macOS:** `source venv/bin/activate`
+2. Inicie o servidor central:
+   ```bash
+   python server.py
+   ```
+   *(Aguarde a mensagem indicando que o servidor está ouvindo na porta `8080`).*
+
+---
+
+### Terminal 2: Cliente 1 (Nó de Borda)
+
+1. Abra uma nova janela e navegue até a pasta do projeto.
+2. Ative a `venv`:
+   * **Windows (PowerShell):** `.\venv\Scripts\Activate.ps1`
+   * **Linux / WSL / macOS:** `source venv/bin/activate`
+3. Inicie o primeiro cliente:
+   ```bash
+   python client.py
+   ```
+
+---
+
+### Terminal 3: Cliente 2 (Nó de Borda)
+
+1. Abra uma terceira janela e navegue até a pasta do projeto.
+2. Ative a `venv`:
+   * **Windows (PowerShell):** `.\venv\Scripts\Activate.ps1`
+   * **Linux / WSL / macOS:** `source venv/bin/activate`
+3. Inicie o segundo cliente:
+   ```bash
+   python client.py
+   ```
 
 ---
 
 ## 🔍 4. O que Acontece Durante a Execução e XAI
 
-Assim que os 2 clientes se conectam:
+Assim que o segundo cliente se conecta ao servidor:
 
-1. **Treinamento Federado:** O servidor executa 3 rodadas de agregação via `FedAvg`. Os clientes treinam seus classificadores locais (`SGDClassifier`), usando CTGAN caso as anomalias representem menos de 15% dos dados, e transmitem apenas os pesos (`coef_` e `intercept_`) via gRPC.
+1. **Treinamento Federado:** O servidor executa 3 rodadas de agregação via `FedAvg`. Os clientes treinam seus classificadores locais (`SGDClassifier`), usando **CTGAN** caso as anomalias representem menos de 15% dos dados, e transmitem apenas os pesos (`coef_` e `intercept_`) via gRPC.
 2. **Convergência:** Na 3ª rodada, o modelo alcança 100% de acurácia sobre os dados de validação.
 3. **Auditoria com XAI:**
    - **SHAP (`LinearExplainer`):** Exibe a importância global das variáveis, comprovando que o volume de conexões ativas (`conn_count`) tem o maior peso positivo (~43), caracterizando as varreduras do Caldera.
@@ -74,7 +105,7 @@ Assim que os 2 clientes se conectam:
 
 ## 🛑 5. Encerramento e Limpeza
 
-- **Parar os processos:** Pressione `Ctrl + C` no terminal.
+- **Parar os processos:** Pressione `Ctrl + C` em cada terminal aberto.
 - **Encerrar o agente do Caldera (Windows):**
   ```powershell
   Stop-Process -Name "splunkd" -Force
@@ -83,3 +114,14 @@ Assim que os 2 clientes se conectam:
   ```bash
   deactivate
   ```
+
+---
+
+## 👥 Autores
+
+- **Renan Horochk de Andrade**
+- **Alef De Souza Lima**
+- **Ryan Vinicius Ledo Dos Santos**
+- **Orientador:** Prof. Dr. Antonio Luiz Basile
+
+*Faculdade de Computação e Informática (FCI) — Universidade Presbiteriana Mackenzie (2026)*
